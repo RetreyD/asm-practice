@@ -38,13 +38,13 @@ is_prime:
     je .p
     mov cx,2
 .loop:
-    mov dx,0
+    xor dx,dx
     div cx
     cmp dx,0
     je .np
     inc cx
     cmp cx,ax
-    jle .loop
+    jl .loop
 .p:
     mov al,1
     ret
@@ -57,16 +57,28 @@ _start:
     mov eax,eax
     mov esi,buffer
     call int2str
+
     mov eax,4
     mov ebx,1
     mov ecx,num_msg
     mov edx,8
     int 0x80
+
     mov eax,4
     mov ebx,1
-    mov ecx,buffer
+    mov ecx,esi
     mov edx,20
+.next:
+    cmp byte [ecx],0
+    je .after_num
+    inc ecx
+    jmp .next
+.after_num:
+    sub ecx,esi
+    mov edx,ecx
+    mov ecx,esi
     int 0x80
+
     mov ax,29
     call is_prime
     cmp al,1
